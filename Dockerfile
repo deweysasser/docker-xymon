@@ -26,6 +26,10 @@ ADD redirect.html /var/www/html/index.html
 
 ADD xymon.conf /etc/apache2/conf-enabled/00-xymon.conf
 
+VOLUME /etc/xymon
+
+VOLUME /var/lib/xymon
+
 EXPOSE 80
 EXPOSE 1984
 
