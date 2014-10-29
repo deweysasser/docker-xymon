@@ -1,0 +1,8 @@
+#!/bin/bash
+
+test -f /etc/xymon/hosts.cfg || tar -C /etc/xymon -xzf /root/xymon-config.tgz 
+test -d /var/lib/xymon/rrd || tar -C /var/lib/xymon -xzf /root/xymon-data.tgz 
+
+perl -i -p -e 's/CLIENTHOSTNAME=.*/CLIENTHOSTNAME="xymon-docker"/' /etc/default/xymon-client
+service xymon start
+apachectl -DFOREGROUND
