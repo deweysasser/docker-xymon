@@ -14,6 +14,8 @@ RUN a2enmod authz_groupfile
 
 RUN apt-get install -y xymon
 
+RUN tar -C /etc/xymon -czf /root/xymon-config.tgz .; tar -C /var/lib/xymon -czf /root/xymon-data.tgz .
+
 RUN a2enmod cgi
 
 ADD start /root/start
