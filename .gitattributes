@@ -1,6 +1,14 @@
-*.c  text
-*.txt text
+.gitignore text
+.gitattributes text
+
 Dockerfile text
+docker-compose.yml text
+
+*.txt text
+
+Makefile text
+
+*.c  text
 *.md text
 *.py text
 *.el text
