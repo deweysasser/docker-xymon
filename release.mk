@@ -20,59 +20,33 @@
 # Various settings -- customize to your environment
 RELEASE_BRANCH?=release
 RELEASE_NOTES=ReleaseNotes.md
+VERSION?=$(shell date -u "+%Y/%m/%d %H:%M:%S")
+VERSION_STRING?=$(VERSION)
+VERSION_TAG=$(shell echo -n $(strip $(VERSION_STRING)) | tr -c "A-Za-z0-9_-" ".")
 
 # The current branch
 GIT_BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+
+TAG_PREFIX=$(GIT_BRANCH)/
 
 # How to look up the origin of a branch
 define GIT_ORIGIN
 $(shell (git rev-parse --abbrev-ref --symbolic-full-name $1@{push} | awk -F/ '{print $$1}'))
 endef
 
-
-# Store all version numbers in an external file
-include version.mk
-
-ifeq ($(VPATCH), 0)
-VERSION=$(VMAJOR).$(VMINOR)
-else
-VERSION=$(VMAJOR).$(VMINOR).$(VPATCH)
-endif
-
-
-TAG_PREFIX=$(GIT_BRANCH)/
-
-VERSION_STRING=$(VERSION)
-
-
+ifdef SUPPRESS_RELEASE
 release:
 	@echo "Use one of:  make major-release, make minor-release, make patch-release"
 	@exit 1
+else
+release: minor-release
+endif
 
-patch-bump: version.mk
-	perl -i -p -e 's/^VPATCH=(.*)/"VPATCH=" . ($$1 + 1)/e' version.mk
-	git add version.mk
-
-minor-bump: version.mk
-	perl -i -p \
-	-e 's/^VMINOR=(.*)/"VMINOR=" . ($$1 + 1)/e;' \
-	-e 's/^VPATCH=(.*)/VPATCH=0/' \
-		version.mk
-	git add version.mk
-
-major-bump: version.mk
-	perl -i -p \
-	-e 's/^VMAJOR=(.*)/"VMAJOR=" . ($$1 + 1)/e;' \
-	-e 's/^VMINOR=(.*)/VMINOR=0/;' \
-	-e 's/^VPATCH=(.*)/VPATCH=0/;' \
-		version.mk
-	git add version.mk
-
-version-reset version.mk:
-	printf "VMAJOR=0\\nVMINOR=0\\nVPATCH=0\n" > version.mk
+# Nothing to do for this one
+version-bump:
 
 major-release minor-release patch-release: .release .release/checkout .release/merge 
-	make $(subst -release,-bump,$@)
+	make version-bump VERSION_LEVEL=$(subst -release,,$@)
 	make $(RELEASE_NOTES) .release/tag .release/master-checkout
 	rm -rf .release
 	echo "Release merged and ready.  Type 'make release-push'"
@@ -81,7 +55,7 @@ major-release minor-release patch-release: .release .release/checkout .release/m
 .release/finish:
 
 .release/tag:
-	git tag $(TAG_PREFIX)$(VERSION_STRING)
+	git tag $(TAG_PREFIX)$(VERSION_TAG)
 	touch $@
 
 .release:
@@ -107,7 +81,7 @@ release-abort: .release/master-checkout
 define RELEASE_NOTES_TITLE_TEMPLATE
 ( \
 echo Release $(VERSION_STRING); \
-echo $$(echo Release $(VERSION_STRING) | tr "[a-zA-Z0-9:, /.]" "="); \
+echo $$(echo Release $(VERSION_STRING) | tr -c "=" "="); \
 echo \
 )
 endef
@@ -148,6 +122,8 @@ $(RELEASE_NOTES):  .release/title .release/changes .release/separator .release/o
 info:
 	@echo VERSION=$(VERSION)
 	@echo VERSION_STRING=$(VERSION_STRING)
+	@echo VERSION_TAG=$(VERSION_TAG)
+	@echo TAG to be applied = $(TAG_PREFIX)$(VERSION_TAG)
 	@echo BUILD_NUMBER=$(BUILD_NUMBER)
 	@echo GIT_BRANCH=$(GIT_BRANCH)
 	@echo RELEASE_BRANCH=$(RELEASE_BRANCH)
