@@ -42,12 +42,13 @@ else
 release: minor-release
 endif
 
-# Nothing to do for this one
-version-bump:
+# Nothing to do for these
+version-bump .release/build:
 
 major-release minor-release patch-release: .release .release/checkout .release/merge 
 	make version-bump VERSION_LEVEL=$(subst -release,,$@)
 	make $(RELEASE_NOTES) .release/tag .release/master-checkout
+	make .release/build
 	rm -rf .release
 	echo "Release merged and ready.  Type 'make release-push'"
 
