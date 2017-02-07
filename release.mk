@@ -47,13 +47,14 @@ version-bump .release/build:
 
 major-release minor-release patch-release: .release .release/checkout .release/merge 
 	make version-bump VERSION_LEVEL=$(subst -release,,$@)
-	make $(RELEASE_NOTES) .release/tag .release/master-checkout
-	make .release/build
-	rm -rf .release
+	make $(RELEASE_NOTES) .release/tag 
+	make clean .release/build
+	make .release/master-checkout .release/finish
 	echo "Release merged and ready.  Type 'make release-push'"
 
 
 .release/finish:
+	rm -rf .release
 
 .release/tag:
 	git tag $(TAG_PREFIX)$(VERSION_TAG)
