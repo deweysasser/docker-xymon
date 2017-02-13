@@ -194,3 +194,5 @@ bin/*
 
 .kitchen/
 .kitchen.local.yml
+.running
+local.mk

@@ -1,8 +1,8 @@
-Base Repository
-===============
+Make Library
+============
 
-This is a basic GIT repository with preconfigure .gitignore and
-.gitattributes to something reasonable. use as a base, merge in to
-your existing repository, or just cut-and-paste to use.
+Aside from including
+[base-repo](http://github.com/deweysasser/base-repo), this provides an
+includable set of make recipes for use in other projects.
 
 See [ToolUse.md] for more information.
