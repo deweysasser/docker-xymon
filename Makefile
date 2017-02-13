@@ -6,6 +6,9 @@ all::
 # Local variable overrides
 -include local.mk
 
+# We're using GIT -- a number of other packages depend on it
+include makefiles/git.mk
+
 # Some standard make targets
 include makefiles/standard.mk
 
