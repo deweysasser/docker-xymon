@@ -4,7 +4,12 @@ PROFILE=default
 PUSH=$(if $(REGISTRY_BASE),true,false)
 ECR=aws --profile $(PROFILE) --output text ecr
 
-DOCKERFILE=$(wildcard Dockerfile)
+# In the future, we might want to run production off of a "release" branch
+ifeq (${GIT_BRANCH},release)
+PUSH_TAG=stable
+else
+PUSH_TAG=${TAG}
+endif
 
 PUSHED=$(subst .built,.pushed,$(IMAGES))
 
@@ -13,8 +18,8 @@ all:: $(STATE)/ecr-login $(PUSHED)
 endif
 
 $(STATE)/%.pushed: $(STATE)/%.repo $(STATE)/%.built  | $(STATE)/ecr-login
-	docker tag $*:$(TAG) $(REGISTRY_BASE)/$*:$(TAG)
-	docker push $(REGISTRY_BASE)/$*:$(TAG)
+	docker tag $*:$(TAG) $(REGISTRY_BASE)/$*:$(PUSH_TAG)
+	docker push $(REGISTRY_BASE)/$*:$(PUSH_TAG)
 	touch $@
 
 
