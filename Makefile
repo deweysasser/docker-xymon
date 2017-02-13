@@ -7,17 +7,17 @@ all::
 -include local.mk
 
 # Some standard make targets
-include standard.mk
+include makefiles/standard.mk
 
 # Use semantic versioning template
-include semver.mk
+include makefiles/semver.mk
 
 # and GIT release tools
-include git-release.mk
+include makefiles/git-release.mk
 
 # a number of projects that track external state, including docker, aws stuff, ...
-include external-state.mk
+include makefiles/external-state.mk
 
 # AWS docker magic
-include docker.mk
-include aws-ecr.mk
+include makefiles/docker.mk
+include makefiles/aws-ecr.mk
