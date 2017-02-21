@@ -13,12 +13,32 @@ TASKSTATE=$(STATE)/$(PROFILE)
 # all *targets* by examining the sources
 TASKDEFS=$(wildcard *.taskdef)
 SERVICES=$(wildcard *.service)
+AUTOCREATE_TASKDEFS=$(shell grep -l AUTOCREATE.SERVICE $(TASKDEFS))
+
+
+ECS_TARGETS=$(foreach s,$(SERVICES),$(SERVICESTATE)/$t) $(foreach t,$(TASKDEFS),$(TASKSTATE)/$(TASK_PREFIX)$t) $(foreach s,$(AUTOCREATE_TASKDEFS),$(SERVICESTATE)/$(subst .taskdef,.autoservice,$s))
+
+all:: $(ECS_TARGETS)
+
+
 
 # How to deploy a task
 $(TASKSTATE)/$(TASK_PREFIX)%.taskdef: %.taskdef 
-	$(ECS) register-task-definition --family "$(NAME)" --cli-input-json file://$< --query "taskDefinition.[family,revision]"
+	$(ECS) register-task-definition --family "$(TASK_PREFIX)$*" --cli-input-json file://$< --query "taskDefinition.[family,revision]"
 	@touch $@
 
+# Deploy an autocreated service
+$(SERVICESTATE)/%.autoservice: NAME=$(notdir $(basename $@))
+$(SERVICESTATE)/%.autoservice: $(TASKSTATE)/$(TASK_PREFIX)%.taskdef
+	@mkdir -p $(dir $@)
+	if [ -f $(SERVICESTATE)/$(NAME).autoservice ] ; then \
+	  echo "Updating autoservice $(NAME)" ;\
+	   $(ECS) update-service --service $(NAME) --task-definition $(TASK_PREFIX)$(NAME) --desired-count 1 --cluster $(CLUSTER)  --query "service.deployments[0].{desired:desiredCount,running:runningCount}" ;\
+	else \
+	  echo "Creating autoservice $(NAME)" ;\
+	   $(ECS) create-service --service-name $(NAME) --cluster $(CLUSTER) --task-definition $(TASK_PREFIX)$(NAME) --desired-count 1 ; \
+	fi
+	touch $@ $(SERVICESTATE)/$(NAME).service 
 
 define drain-service
 	   $(ECS) update-service --service $(NAME) --desired-count 0 --cluster $(CLUSTER)  --query "service.deployments[0].{desired:desiredCount,running:runningCount}"; \
@@ -57,11 +77,12 @@ drain/%.service:
 
 remove/%.service: drain/%.service
 	-test -f $(SERVICESTATE)/$(notdir $@) && $(ECS) delete-service --service $(notdir $*) --cluster $(CLUSTER) --query "service.serviceArn" && sleep 20s
-	rm -f $(SERVICESTATE)/$(notdir $@) $(SERVICESTATE)/$(notdir $*).taskservice
+	rm -f $(SERVICESTATE)/$(notdir $@) $(SERVICESTATE)/$(notdir $*).autoservice
 
 info::
 	@echo TASKDEFS=$(TASKDEFS)
-	@echo TASKSERVICES=$(TASKSERVICES)
+	@echo AUTOSERVICES=$(AUTOCREATE_TASKDEFS)
 	@echo SERVICES=$(SERVICES)
+	@echo TARGETS=$(ECS_TARGETS)
 
 
