@@ -1,4 +1,4 @@
 clean::
-	rm -f *~ #*
+	rm -f *~ \#*
 
 distclean::
