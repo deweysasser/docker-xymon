@@ -4,7 +4,7 @@ STATE=.running
 ifneq ($(wildcard $(STATE)),$(STATE)) 
 all:: $(STATE)
 $(STATE)::
-	mkdir -p $@
+	@mkdir -p $@
 endif
 
 distclean::

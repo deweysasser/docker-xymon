@@ -28,7 +28,8 @@ $(STATE)/%.repo: | $(STATE)
 cleanup:: $(foreach p,$(PUSHED),cleanup/$(notdir $p))
 
 cleanup/%.pushed:
-	for i in $$($(ECR) describe-images --repository-name $* --query imageDetails[*].[imageDigest,imageTags[0]] | awk '/None/{print $$1}' | head -n -2); do $(ECR) batch-delete-image --repository-name $* --image-ids imageDigest=$$i; done
+	@echo "Cleaning docker image $*"
+	@for i in $$($(ECR) describe-images --repository-name $* --query imageDetails[*].[imageDigest,imageTags[0]] | awk '/None/{print $$1}' | head -n -2); do $(ECR) batch-delete-image --repository-name $* --image-ids imageDigest=$$i; done
 
 
 info::
