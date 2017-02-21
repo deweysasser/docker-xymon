@@ -1,2 +1,4 @@
 clean::
 	rm -f *~ #*
+
+distclean::
