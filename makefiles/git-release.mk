@@ -24,8 +24,15 @@ VERSION?=$(shell date -u "+%Y/%m/%d %H:%M:%S")
 VERSION_STRING?=$(VERSION)
 VERSION_TAG=$(shell echo -n $(strip $(VERSION_STRING)) | tr -c "A-Za-z0-9_-" ".")
 
+# The current branch
+GIT_BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+
 TAG_PREFIX=$(GIT_BRANCH)/
 
+# How to look up the origin of a branch
+define GIT_ORIGIN
+$(shell (git rev-parse --abbrev-ref --symbolic-full-name $1@{push} | awk -F/ '{print $$1}'))
+endef
 
 ifdef SUPPRESS_RELEASE
 release:
