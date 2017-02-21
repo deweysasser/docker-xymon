@@ -20,8 +20,6 @@ ECS_TARGETS=$(foreach s,$(SERVICES),$(SERVICESTATE)/$t) $(foreach t,$(TASKDEFS),
 
 all:: $(ECS_TARGETS)
 
-
-
 # How to deploy a task
 $(TASKSTATE)/$(TASK_PREFIX)%.taskdef: %.taskdef 
 	$(ECS) register-task-definition --family "$(TASK_PREFIX)$*" --cli-input-json file://$< --query "taskDefinition.[family,revision]"
@@ -30,7 +28,6 @@ $(TASKSTATE)/$(TASK_PREFIX)%.taskdef: %.taskdef
 # Deploy an autocreated service
 $(SERVICESTATE)/%.autoservice: NAME=$(notdir $(basename $@))
 $(SERVICESTATE)/%.autoservice: $(TASKSTATE)/$(TASK_PREFIX)%.taskdef
-	@mkdir -p $(dir $@)
 	if [ -f $(SERVICESTATE)/$(NAME).autoservice ] ; then \
 	  echo "Updating autoservice $(NAME)" ;\
 	   $(ECS) update-service --service $(NAME) --task-definition $(TASK_PREFIX)$(NAME) --desired-count 1 --cluster $(CLUSTER)  --query "service.deployments[0].{desired:desiredCount,running:runningCount}" ;\
@@ -78,6 +75,33 @@ drain/%.service:
 remove/%.service: drain/%.service
 	-test -f $(SERVICESTATE)/$(notdir $@) && $(ECS) delete-service --service $(notdir $*) --cluster $(CLUSTER) --query "service.serviceArn" && sleep 20s
 	rm -f $(SERVICESTATE)/$(notdir $@) $(SERVICESTATE)/$(notdir $*).autoservice
+
+# Load the initial state
+
+#ifneq ($(wildcard $(SERVICESTATE)), $(SERVICESTATE))
+$(STATE):: $(SERVICESTATE)/.services-recorded $(TASKSTATE)/.taskdefs-recorded
+#endif
+
+$(SERVICESTATE)/.services-recorded:
+	@mkdir -p $(dir $@)
+	@echo "Inspecting defined services"
+	@for arn in $$( $(ECSTEXT) list-services --cluster ${CLUSTER} | tr -d '\r' | cut -f 2); do \
+	   name=$$(echo $$arn | cut -d / -f 2 | cut -d : -f 1 ) ;\
+	    echo "  - " $$name ;\
+	    touch $(dir $2)/$$name.service ;\
+	done
+	@touch $@
+
+$(TASKSTATE)/.taskdefs-recorded:
+	@mkdir -p $(dir $@)
+	@echo "Inspecting defined tasks"
+	@for name in $$( $(ECSTEXT) list-task-definitions | tr -d '\r' | cut -d / -f 2 | cut -d : -f 1 | sort -u); do \
+	    echo "  - " $$name ;\
+	    touch $(dir $2)/$$name.taskdef ;\
+	done
+	@touch $@
+
+
 
 info::
 	@echo TASKDEFS=$(TASKDEFS)
