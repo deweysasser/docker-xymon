@@ -1,23 +1,23 @@
 # Might want to add "--no-cache" to this
 DBUILD_FLAGS=
 DBUILD=docker build $(DBUILD_FLAGS)
-PROJECT?=$(notdir $(CURDIR))
-
+IMAGE_PREFIX?=$(USER)-sandbox-
 DOCKERFILE=$(wildcard Dockerfile)
 
+# In the future, we might want to run production off of a "release" branch
 TAG=latest
 
-IMAGES=$(foreach x,$(wildcard */Dockerfile),$(patsubst %/,%,$(dir $(STATE)/$x)).built) $(if $(DOCKERFILE),$(STATE)/$(PROJECT).built)
+IMAGES=$(foreach x,$(wildcard */Dockerfile),$(STATE)/$(IMAGE_PREFIX)$(patsubst %/,%,$(dir $x)).built) $(if $(DOCKERFILE),$(STATE)/$(IMAGE_PREFIX)$(notdir $(CURDIR)).built)
 
 all:: $(IMAGES)
 
-$(STATE)/%.built: %/*
-	$(DBUILD) -t $*:$(TAG) $*
+$(STATE)/$(IMAGE_PREFIX)%.built: %/*
+	$(DBUILD) -t $(notdir $(basename $@)):$(TAG) $*
 	touch $@
 
 ifdef DOCKERFILE
-$(STATE)/$(notdir $(CURDIR)).built: Dockerfile 
-	$(DBUILD) -t $(PROJECT):$(TAG) .
+$(STATE)/$(IMAGE_PREFIX)$(notdir $(CURDIR)).built: Dockerfile 
+	$(DBUILD) -t $(notdir $(basename $@)):$(TAG) .
 	touch $@
 endif
 
@@ -25,6 +25,5 @@ endif
 info::
 	@echo IMAGES=$(IMAGES)
 	@echo DOCKERFILE=$(DOCKERFILE)
-	@echo PROJECT=$(PROJECT)
 
 
