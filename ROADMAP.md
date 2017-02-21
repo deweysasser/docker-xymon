@@ -1,4 +1,5 @@
-* (DONE) docker -- build docker images
+* (DONE) docker -- build docker imagesg
 * (DONE) aws-ecr -- push docker to AWS ECR
-* aws-cfn -- CloudFormation stacks
-* aws-ecs -- taskdefs and services
+* (DONE) aws-cloudformation -- CloudFormation stacks
+* (DONE) aws-ecs -- taskdefs and services
+* build a test suite
