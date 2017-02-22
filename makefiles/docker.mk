@@ -12,13 +12,13 @@ IMAGES=$(foreach x,$(wildcard */Dockerfile),$(STATE)/$(IMAGE_PREFIX)$(patsubst %
 all:: $(IMAGES)
 
 $(STATE)/$(IMAGE_PREFIX)%.built: %/*
-	$(DBUILD) -t $(notdir $(basename $@)):$(TAG) $*
-	touch $@
+	$(DBUILD) -t $(IMAGE_PREFIX)$(patsubst %/,%,$(dir $<)):$(TAG) $*
+	@mkdir -p $(dir $@); touch $@
 
 ifdef DOCKERFILE
 $(STATE)/$(IMAGE_PREFIX)$(notdir $(CURDIR)).built: Dockerfile 
 	$(DBUILD) -t $(notdir $(basename $@)):$(TAG) .
-	touch $@
+	@mkdir -p $(dir $@); touch $@
 endif
 
 
