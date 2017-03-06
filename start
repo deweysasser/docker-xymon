@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ -n "$TZ" ] ; then
+    ln -sf /usr/share/zoneinfo/$TZ /etc/localtime
+fi
+
 test -f /etc/xymon/hosts.cfg || tar -C /etc/xymon -xzf /root/xymon-config.tgz 
 test -d /var/lib/xymon/rrd || tar -C /var/lib/xymon -xzf /root/xymon-data.tgz 
 
