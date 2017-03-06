@@ -21,6 +21,8 @@ RUN perl -i -p -e "s/^127.0.0.1.*/127.0.0.1    xymon-docker # bbd http:\/\/local
 # And save the configuration so when this container starts with a blank volume, we can initialize it
 RUN tar -C /etc/xymon -czf /root/xymon-config.tgz .; tar -C /var/lib/xymon -czf /root/xymon-data.tgz .
 
+ENV TZ=posixrules
+
 ADD start /root/start
 
 ADD placeholder.html /var/lib/xymon/www/index.html

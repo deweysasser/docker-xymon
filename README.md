@@ -24,6 +24,13 @@ Volumes
 * /etc/xymon -- all xymon configuration data
 * /var/lib/xymon -- xymon data (monitoring state)
 
+Timezone
+--------
+
+By default the container will use the 'posixrules' TZ rule set. If
+you'd like to override this, set the environment variable 'TZ',
+e.g. `docker run -d -e TZ=America/New_York`
+
 
 Known Issues
 ============
