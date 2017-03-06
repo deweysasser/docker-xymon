@@ -9,4 +9,8 @@ test -d /var/lib/xymon/rrd || tar -C /var/lib/xymon -xzf /root/xymon-data.tgz
 
 perl -i -p -e 's/CLIENTHOSTNAME=.*/CLIENTHOSTNAME="xymon-docker"/' /etc/default/xymon-client
 service xymon start
+
+# If we're starting it from docker it is *NOT* already running
+rm -f /var/run/apache2/apache2.pid
+
 apachectl -DFOREGROUND
