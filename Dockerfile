@@ -4,21 +4,13 @@ MAINTAINER Dewey Sasser <dewey@sasser.com>
 
 ADD AutomaticCleanup /etc/apt/apt.conf.d/99AutomaticCleanup
 
-RUN apt-get update
+RUN apt-get update &&  apt-get install -y xymon apache2
 
-RUN apt-get install -y apache2
-
-RUN a2enmod rewrite
-
-RUN a2enmod authz_groupfile
-
-RUN apt-get install -y xymon
+RUN a2enmod rewrite authz_groupfile cgi
 
 RUN perl -i -p -e "s/^127.0.0.1.*/127.0.0.1    xymon-docker # bbd http:\/\/localhost\//" /etc/xymon/hosts.cfg
 
 RUN tar -C /etc/xymon -czf /root/xymon-config.tgz .; tar -C /var/lib/xymon -czf /root/xymon-data.tgz .
-
-RUN a2enmod cgi
 
 ADD start /root/start
 
