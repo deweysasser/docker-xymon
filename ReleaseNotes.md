@@ -1,3 +1,11 @@
+Release 1.2
+============
+
+* Dynamically generate a ghost list page for ghost hosts
+
+* Remove outdated apache PID file
+
+
 Release 1.1
 ============
 
