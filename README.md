@@ -3,10 +3,29 @@ docker-xymon
 
 Dockerization of the Xymon monitoring system on an Ubuntu base
 
-Example
-=======
+Quick Start
+===========
 
-    docker run -d -p 80:80 -p 1984:1984 -v /etc/xymon:/etc/xymon --name xymon deweysasser/xymon
+    docker run -d -p 80:80 -p 1984:1984 -v /etc/xymon:/etc/xymon -v /var/lib/xymon:/var/lib/xymon --name xymon deweysasser/xymon
+
+or use docker-compose with
+
+```
+xymon:
+  image: deweysasser/xymon
+  ports:
+    - 80:80
+    - 1984:1984
+  volumes:
+    - xymon-config:/etc/xymon
+    - xymon-data:/var/lib/xymon
+  environment:
+    SSMTP_mailhub: mail.example.com
+    SSMTP_AuthUser: user
+    SSMTP_AuthPass: password
+    SSMTP_AuthMethod: LOGIN
+    SSMTP_UseTLS: "Yes"
+```
 
 Interface
 =========
@@ -16,6 +35,14 @@ Ports
 
 * 80 -- Web server
 * 1984 -- Xymon/bb client reporting port
+
+You only need to expose port 1984 if you are going to use a xymon
+client
+(e.g. [native](http://packages.ubuntu.com/trusty/net/xymon-client),
+[Windows](http://bbwin.sourceforge.net/) or
+[docker](https://hub.docker.com/r/deweysasser/xymon-client/)).
+
+Port 1984 should *NOT* be exposed to public (Internet facing) traffic.
 
 Sending Mail
 ------------
@@ -55,7 +82,7 @@ Volumes
 Timezone
 --------
 
-By default the container will use the 'posixrules' TZ rule set. If
+By default the container will use the `posixrules` TZ rule set. If
 you'd like to override this, set the environment variable 'TZ',
 e.g. `docker run -d -e TZ=America/New_York`
 
