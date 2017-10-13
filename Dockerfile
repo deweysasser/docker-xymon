@@ -1,4 +1,4 @@
-FROM ubuntu:14.04.1
+FROM ubuntu:16.04
 MAINTAINER Dewey Sasser <dewey@sasser.com>
 
 env DEBIAN_FRONTEND=noninteractive TZ=posixrules
