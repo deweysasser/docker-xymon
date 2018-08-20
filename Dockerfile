@@ -1,7 +1,7 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 MAINTAINER Dewey Sasser <dewey@sasser.com>
 
-env DEBIAN_FRONTEND=noninteractive TZ=posixrules
+ENV DEBIAN_FRONTEND=noninteractive TZ=posixrules
 ADD AutomaticCleanup /etc/apt/apt.conf.d/99AutomaticCleanup
 
 # Install what we need from Ubuntu
@@ -11,7 +11,7 @@ RUN apt-get update
 RUN apt-get install -y curl xymon apache2 tcpdump ssmtp mailutils rrdtool
 
 # Get the 'dumb init' package for proper 'init' behavior
-RUN curl -L https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64.deb > dumb-init.deb && \
+RUN curl -L https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64.deb > dumb-init.deb && \
     dpkg -i dumb-init.deb && \
     rm dumb-init.deb
 
