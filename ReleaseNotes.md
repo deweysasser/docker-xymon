@@ -1,3 +1,17 @@
+Release 1.4
+============
+
+* Upgrade to latest versions
+
+- Ubuntu 18.04
+
+- Xymon 4.3.28
+
+- Yelp/dumb-init 1.2.2
+
+* add install rrdtool
+
+
 Release 1.3
 ============
 
