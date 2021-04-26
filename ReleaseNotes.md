@@ -1,3 +1,13 @@
+Release 1.5
+============
+
+* Add ntpdate to installed packages.
+
+* Update author email
+
+* Update to 20.04 and dumb-init 1.2.5.
+
+
 Release 1.4
 ============
 
