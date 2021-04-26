@@ -8,7 +8,7 @@ ADD AutomaticCleanup /etc/apt/apt.conf.d/99AutomaticCleanup
 RUN apt-get update
 
 # tcpdump is for debugging client issues, others are required
-RUN apt-get install -y curl xymon apache2 tcpdump ssmtp mailutils rrdtool
+RUN apt-get install -y curl xymon apache2 tcpdump ssmtp mailutils rrdtool ntpdate
 
 # Get the 'dumb init' package for proper 'init' behavior
 RUN curl -L https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_amd64.deb > dumb-init.deb && \
