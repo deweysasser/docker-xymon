@@ -1,5 +1,5 @@
 FROM ubuntu:20.04
-MAINTAINER Dewey Sasser <dewey@sasser.com>
+MAINTAINER Dewey Sasser <dewey@deweysasser.com>
 
 ENV DEBIAN_FRONTEND=noninteractive TZ=posixrules
 ADD AutomaticCleanup /etc/apt/apt.conf.d/99AutomaticCleanup
