@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.10
 MAINTAINER Dewey Sasser <dewey@deweysasser.com>
 
 ENV DEBIAN_FRONTEND=noninteractive TZ=posixrules
